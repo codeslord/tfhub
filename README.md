@@ -21,7 +21,7 @@ In this section, we will use various TF-Hub modules to compare their effect on t
 
 ## Data
 
-We will try to solve the Large Movie Review Dataset v1.0 task from Mass et al. The dataset consists of IMDB movie reviews labeled by positivity from 1 to 10. The task is to label the reviews as negative or positive.
+We will try to solve the [Large Movie Review Dataset v1.0](http://ai.stanford.edu/~amaas/data/sentiment/) task from Mass et al. The dataset consists of IMDB movie reviews labeled by positivity from 1 to 10. The task is to label the reviews as negative or positive.
 
 ## Feature columns
 
