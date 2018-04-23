@@ -45,3 +45,36 @@ def download_and_load_datasets(force_download=False):
 tf.logging.set_verbosity(tf.logging.ERROR)
 train_df, test_df = download_and_load_datasets()
 train_df.head()
+
+# training input on the whole training set with no limit on training epochs
+
+train_input_fn = tf.estimator.inputs.pandas_input_fn(
+    train_df, train_df['polarity'], num_epochs=None, shuffle=True)
+
+# prediction on the whole training set
+predict_train_input_fn = tf.estimator.inputs.pandas_input_fn(
+    train_df, train_df['polarity'], shuffle=False)
+
+# predictions on the test set
+predict_test_input_fn = tf.estimator.inputs.pandas_input_fn(
+    test_df, test_df['polarity'], shuffle=False)
+
+embedded_text_feature_column = hub.text_embedding_column(
+    key="sentence",
+    module_spec="https://tfhub.dev/google/nnlm-en-dim128/1")
+
+estimator = tf.estimator.DNNClassifier(
+    hidden_units=[500, 100],
+    feature_columns=[embedded_text_feature_column],
+    n_classes=2,
+    optimizer=tf.train.AdagradOptimizer(learning_rate=0.003))
+
+# training for 1000 steps
+estimator.train(input_fn=train_input_fn, steps=1000)
+
+# Run predictions for both training and testing set_verbosity
+train_eval_result = estimator.evaluate(input_fn=predict_train_input_fn)
+test_eval_result = estimator.evaluate(input_fn=predict_test_input_fn)
+
+print("Training set accuracy: {accuracy}:".format(**train_eval_result))
+print("Test set accuracy: {accuracy}".format(**test_eval_result))
