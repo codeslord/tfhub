@@ -103,4 +103,40 @@ plt.xlabel('Predicted')
 plt.ylabel('True')
 
 
- 
+def train_and_evaluate_with_module(hub_module, train_module=False):
+embedded_text_feature_column = hub.text_embedding_column(
+  key="sentence", module_spec=hub_module, trainable=train_module)
+
+estimator = tf.estimator.DNNClassifier(
+  hidden_units=[500, 100],
+  feature_columns=[embedded_text_feature_column],
+  n_classes=2,
+  optimizer=tf.train.AdagradOptimizer(learning_rate=0.003))
+
+estimator.train(input_fn=train_input_fn, steps=1000)
+
+train_eval_result = estimator.evaluate(input_fn=predict_train_input_fn)
+test_eval_result = estimator.evaluate(input_fn=predict_test_input_fn)
+
+training_set_accuracy = train_eval_result["accuracy"]
+test_set_accuracy = test_eval_result["accuracy"]
+
+return {
+  "Training accuracy": training_set_accuracy,
+  "Test accuracy": test_set_accuracy
+}
+
+results = {}
+results["nnlm-en-dim128"] = train_and_evaluate_with_module(
+    "https://tfhub.dev/google/nnlm-en-dim128/1")
+results["nnlm-en-dim128-with-module-training"] = train_and_evaluate_with_module(
+    "https://tfhub.dev/google/nnlm-en-dim128/1", True)
+results["random-nnlm-en-dim128"] = train_and_evaluate_with_module(
+    "https://tfhub.dev/google/random-nnlm-en-dim128/1")
+results["random-nnlm-en-dim128-with-module-training"] = train_and_evaluate_with_module(
+    "https://tfhub.dev/google/random-nnlm-en-dim128/1", True)
+
+
+pd.DataFrame.from_dict(results, orient="index")
+
+estimator.evaluate(input_fn=predict_test_input_fn)["accuracy_baseline"]
