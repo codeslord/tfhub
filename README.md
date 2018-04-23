@@ -2,7 +2,7 @@
 
 TF-Hub is a platform to share machine learning expertise packaged in reusable resources, notably pre-trained modules. This tutorial is organized into two main parts.
 
-  ```Python
+  ```
   pip install --upgrade tensorflow
 
   pip install --upgrade tensorflow-gpu
